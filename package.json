@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/servidor.js"
+    "dev": "node --watch src/socket-back.js"
   },
   "keywords": [],
   "author": "",
