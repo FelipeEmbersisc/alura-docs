@@ -3,6 +3,7 @@ import http from "node:http";
 import url from "node:url";
 import path from "node:path";
 import { Server } from "socket.io";
+import "./db-connect.js";
 
 const porta = process.env.PORTA || 3000;
 
