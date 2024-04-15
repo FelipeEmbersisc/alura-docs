@@ -13,10 +13,14 @@ io.on("connection", (socket) => {
    });
 
    socket.on("adicionar_documento", async (nome) => {
-      const resultado = await adicionarDocumento(nome);
-
-      if (resultado.acknowledged) {
-         io.emit("adicionar_documento_interface", nome);
+      const documentoExiste = (await encontrarDocumento(nome)) !== null;
+      if (documentoExiste) {
+         socket.emit("documento_existente", nome);
+      } else {
+         const resultado = await adicionarDocumento(nome);
+         if (resultado.acknowledged) {
+            io.emit("adicionar_documento_interface", nome);
+         }
       }
    });
 
@@ -24,7 +28,6 @@ io.on("connection", (socket) => {
       socket.join(nomeDocumento);
 
       const documento = await encontrarDocumento(nomeDocumento);
-
       if (documento) {
          devolverTexto(documento.texto);
       }
@@ -32,7 +35,6 @@ io.on("connection", (socket) => {
 
    socket.on("texto_editor", async ({ texto, nomeDocumento }) => {
       const atualizacao = await atualizaDocumento(nomeDocumento, texto);
-
       if (atualizacao.modifiedCount) {
          socket.to(nomeDocumento).emit("texto_editor_clientes", texto);
       }
