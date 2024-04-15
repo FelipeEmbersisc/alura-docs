@@ -8,21 +8,28 @@ tituloDocumento.textContent = nomeDocumento || "Documento sem título";
 
 const botaoExcluir = document.getElementById("excluir-documento");
 botaoExcluir.addEventListener("click", () => {
-  emitirExcluirDocumento(nomeDocumento);
+   emitirExcluirDocumento(nomeDocumento);
 });
 
 selecionarDocumento(nomeDocumento);
 
 const textoEditor = document.getElementById("editor-texto");
 textoEditor.addEventListener("keyup", () => {
-  emitirTextoEditor({
-    texto: textoEditor.value, 
-    nomeDocumento
-  });
+   emitirTextoEditor({
+      texto: textoEditor.value,
+      nomeDocumento
+   });
 });
 
 function atualizarTextoEditor(texto) {
-  textoEditor.value = texto;
+   textoEditor.value = texto;
 }
 
-export { atualizarTextoEditor }
+function alertarERedirecionar(nome) {
+   if (nome === nomeDocumento) {
+      alert(`Documento ${nome} excluido!`);
+      window.location.href = "/";
+   }
+}
+
+export { atualizarTextoEditor, alertarERedirecionar }
