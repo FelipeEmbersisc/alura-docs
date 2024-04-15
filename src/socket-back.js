@@ -1,28 +1,40 @@
-import { atualizaDocumento, encontrarDocumento, obterDocumentos } from "./documentos-db.js";
+import {
+   adicionarDocumento,
+   atualizaDocumento,
+   encontrarDocumento,
+   obterDocumentos,
+} from "./documentos-db.js";
 import io from "./servidor.js";
 
 io.on("connection", (socket) => {
-  socket.on("obter_documentos", async (devolverDocumentos) => {
-    const documentos = await obterDocumentos();
+   socket.on("obter_documentos", async (devolverDocumentos) => {
+      const documentos = await obterDocumentos();
+      devolverDocumentos(documentos);
+   });
 
-    devolverDocumentos(documentos);
-  });
+   socket.on("adicionar_documento", async (nome) => {
+      const resultado = await adicionarDocumento(nome);
 
-  socket.on("selecionar_documento", async (nomeDocumento, devolverTexto) => {
-    socket.join(nomeDocumento);
+      if (resultado.acknowledged) {
+         io.emit("adicionar_documento_interface", nome);
+      }
+   });
 
-    const documento = await encontrarDocumento(nomeDocumento);
+   socket.on("selecionar_documento", async (nomeDocumento, devolverTexto) => {
+      socket.join(nomeDocumento);
 
-    if (documento) {
-      devolverTexto(documento.texto);
-    }
-  });
+      const documento = await encontrarDocumento(nomeDocumento);
 
-  socket.on("texto_editor", async ({ texto, nomeDocumento }) => {
-    const atualizacao = await atualizaDocumento(nomeDocumento, texto);
-    
-    if (atualizacao.modifiedCount) {
-      socket.to(nomeDocumento).emit("texto_editor_clientes", texto);
-    }
-  });
+      if (documento) {
+         devolverTexto(documento.texto);
+      }
+   });
+
+   socket.on("texto_editor", async ({ texto, nomeDocumento }) => {
+      const atualizacao = await atualizaDocumento(nomeDocumento, texto);
+
+      if (atualizacao.modifiedCount) {
+         socket.to(nomeDocumento).emit("texto_editor_clientes", texto);
+      }
+   });
 });
